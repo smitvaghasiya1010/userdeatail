@@ -59,18 +59,20 @@ class UserService {
           statusCode: response.statusCode,
         );
       }
-    } on SocketException {
-      throw UserServiceException('No internet connection. Please check your network.');
-    } on http.ClientException {
-      throw UserServiceException('Network communication error. Please try again.');
+    } on SocketException catch (e) {
+      throw UserServiceException(
+        'No internet connection or network access error (${e.message}). Please check your connection.',
+      );
+    } on http.ClientException catch (e) {
+      throw UserServiceException('Network communication error: ${e.message}');
     } on TimeoutException {
       throw UserServiceException('Connection timed out. Please try again.');
-    } on FormatException {
-      throw UserServiceException('Invalid response format received from server.');
+    } on FormatException catch (e) {
+      throw UserServiceException('Invalid data format received from server: ${e.message}');
     } on UserServiceException {
       rethrow;
     } catch (e) {
-      throw UserServiceException('Something went wrong. Please try again.');
+      throw UserServiceException('Something went wrong ($e). Please try again.');
     }
   }
 }
